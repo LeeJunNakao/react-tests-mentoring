@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -9,10 +9,12 @@ import { ListWrapper } from './styles';
 
 type Props = {
   items: string[];
+  onChange?: (v: string[]) => void;
 };
 
 const SelectableList = (props: Props) => {
   const [checked, setChecked] = useState<string[]>([]);
+
   const handleToggle = (index: string) => () => {
     if (checked.includes(index)) {
       setChecked(checked.filter((i) => i !== index));
@@ -20,6 +22,10 @@ const SelectableList = (props: Props) => {
       setChecked([...checked, index]);
     }
   };
+
+  useEffect(() => {
+    if (props.onChange) props.onChange(checked);
+  }, [checked]);
 
   const Items = props.items.map((value, index) => {
     const labelId = `checkbox-list-label-${value}`;
