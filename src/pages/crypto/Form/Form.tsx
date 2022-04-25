@@ -4,10 +4,9 @@ import { Box } from '@mui/system';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axios, { AxiosResponse } from 'axios';
-import CachedIcon from '@mui/icons-material/Cached';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Coin, CoinOption } from 'entities/Crypto';
-import { LoadingWrapper } from './styles';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const debounced = _.debounce(async (fn) => await fn(), 1000);
 
@@ -44,10 +43,6 @@ const Form = (props: Props) => {
   useEffect(() => {
     debounced(search);
   }, [crypto]);
-
-  useEffect(() => {
-    console.log('!!!!!!!!!!!!!!!!!', selectedCrypto);
-  }, [selectedCrypto]);
 
   const handleChange =
     (setter: any) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,6 +95,7 @@ const Form = (props: Props) => {
             setSelectedCrypto(item?.value);
             setCrypto(item?.label || '');
           }}
+          noOptionsText={loading ? 'loading...' : 'No Options'}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -107,6 +103,17 @@ const Form = (props: Props) => {
               variant='standard'
               value={crypto}
               onChange={handleChange(setCrypto)}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <React.Fragment>
+                    {loading ? (
+                      <CircularProgress color='inherit' size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </React.Fragment>
+                ),
+              }}
             />
           )}
         />
@@ -126,15 +133,10 @@ const Form = (props: Props) => {
           onChange={handleChange(setQuantity)}
           type='number'
         />
-        {loading ? (
-          <LoadingWrapper>
-            <CachedIcon />
-          </LoadingWrapper>
-        ) : (
-          <Button variant='contained' onClick={handleClick}>
-            add
-          </Button>
-        )}
+
+        <Button variant='contained' onClick={handleClick}>
+          add
+        </Button>
       </Box>
     </>
   );
