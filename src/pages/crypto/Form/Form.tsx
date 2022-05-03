@@ -1,36 +1,46 @@
+/* eslint-disable indent */
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import { Box } from '@mui/system';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import axios, { AxiosResponse } from 'axios';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Coin, CoinOption } from 'entities/Crypto';
 import CircularProgress from '@mui/material/CircularProgress';
+import { searchCrypto, searchPrice } from 'services/crypto';
+import { dateToString } from 'utils/parser';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const debounced = _.debounce(async (fn) => await fn(), 1000);
 
-export type CryptoEntry = Coin & {
+export type CryptoEntry = {
+  code: string;
   quantity: number;
-};
-
-type CoinGeckResponse = {
-  coins: Coin[];
+  price?: number;
+  total?: number;
 };
 
 type Props = {
   add: (v: CryptoEntry) => void;
 };
 
-const Form = (props: Props) => {
-  const [crypto, setCrypto] = useState('');
-  const [quantity, setQuantity] = useState<string | null>(null);
+enum ErrorMessage {
+  DEFAULT = 'Could not search price',
+  UNAVAIBLE = 'This cryptocurrency is not avaible',
+}
 
+const Form = (props: Props) => {
+  const [crypto, setCrypto] = useState('helooooo');
+  const [quantity, setQuantity] = useState<string | null>('');
+  const [autocompleteKey, setAutocompleteKey] = useState(1);
   const [selectedCrypto, setSelectedCrypto] = useState<Coin | null | undefined>(
     null,
   );
   const [searchResult, setSearchResult] = useState<Coin[]>([]);
   const [loading, setLoading] = useState(false);
+  const [openError, setOpenError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(ErrorMessage.DEFAULT);
 
   const cryptoOptions = searchResult.map(
     (c): CoinOption => ({
@@ -49,35 +59,80 @@ const Form = (props: Props) => {
       setter(event.target.value);
     };
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (selectedCrypto && Number(quantity) >= 0) {
-      const register = {
-        ...selectedCrypto,
+      searchCryptoPrice();
+    }
+  };
 
+  const clearForm = () => {
+    setCrypto('');
+    setQuantity('');
+    setSelectedCrypto(null);
+    setAutocompleteKey(autocompleteKey + 1);
+  };
+
+  const searchCryptoPrice = async () => {
+    try {
+      setLoading(true);
+      const item = {
+        ...selectedCrypto,
         quantity: Number(quantity),
       };
+      const price = await searchPrice(
+        item.symbol as string,
+        dateToString(new Date()),
+      );
 
-      props.add(register);
+      if (price.error) {
+        setOpenError(true);
+      } else {
+        props.add({
+          code: item.symbol as string,
+          quantity: Number(quantity),
+          price: price.data?.closePrice || 0,
+        });
+      }
 
-      setCrypto('');
-      setQuantity(null);
+      clearForm();
+    } catch (error) {
+      setErrorMessage(ErrorMessage.DEFAULT);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenError(false);
   };
 
   const search = async () => {
     if (crypto) {
       try {
         setLoading(true);
-        const result: AxiosResponse<CoinGeckResponse> = await axios.get(
-          `https://api.coingecko.com/api/v3/search?query=${crypto}`,
-        );
 
-        setSearchResult(result.data.coins);
+        const result = await searchCrypto(crypto);
+
+        setSearchResult(result.coins);
       } finally {
         setLoading(false);
       }
     }
   };
+
+  const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+    props,
+    ref,
+  ) {
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+  });
 
   return (
     <>
@@ -95,6 +150,7 @@ const Form = (props: Props) => {
             setSelectedCrypto(item?.value);
             setCrypto(item?.label || '');
           }}
+          key={autocompleteKey}
           noOptionsText={loading ? 'loading...' : 'No Options'}
           renderInput={(params) => (
             <TextField
@@ -138,6 +194,16 @@ const Form = (props: Props) => {
           add
         </Button>
       </Box>
+      <Snackbar
+        open={openError}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message='Note archived'
+      >
+        <Alert onClose={handleClose} severity='error' sx={{ width: '100%' }}>
+          This cryptocurrency is not avaible
+        </Alert>
+      </Snackbar>
     </>
   );
 };

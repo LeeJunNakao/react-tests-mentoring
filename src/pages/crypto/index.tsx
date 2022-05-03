@@ -13,10 +13,6 @@ const CryptoPage = () => {
     setCryptos([...cryptos, crypto]);
   };
 
-  useEffect(() => {
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@', cryptos);
-  }, [cryptos]);
-
   return (
     <Page title='Crypto'>
       <Box
