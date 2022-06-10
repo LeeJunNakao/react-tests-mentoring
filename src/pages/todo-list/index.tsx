@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Page from 'components/Layout/Page';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -7,22 +7,12 @@ import SelectableList from 'components/Lists/SelectableList';
 import MessageBox from 'components/MessageBox';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavigatorButton from 'components/Buttons/NavigatorButton';
+import { useHooks } from './todo-list-hooks'
 import { MessageWrapper } from './styles';
 
+
 const ToDoPage = () => {
-  const [items, setItems] = useState<string[]>([]);
-  const [itemsDone, setItemsDone] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState('');
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-  };
-
-  const addItem = () => {
-    setItems([...items, inputValue]);
-    setInputValue('');
-  };
-
+  const {items, itemsDone, setItemsDone, inputValue, handleChange, addItem, removeItens} = useHooks();
   return (
     <Page title='To Do List'>
       <>
@@ -53,13 +43,18 @@ const ToDoPage = () => {
               add
             </Button>
           </Box>
-
           <MessageWrapper>
             {items.length > 0 && items.length === itemsDone.length && (
               <MessageBox text='All tasks completed successfully' />
             )}
           </MessageWrapper>
 
+          {itemsDone.length ? (
+            <Button onClick={removeItens}>
+              remover
+            </Button>
+          ) :
+            (<div />)}
           <SelectableList items={items} onChange={setItemsDone} />
         </Box>
       </>
