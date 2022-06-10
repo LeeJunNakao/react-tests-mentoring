@@ -7,7 +7,7 @@ import SelectableList from 'components/Lists/SelectableList';
 import MessageBox from 'components/MessageBox';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavigatorButton from 'components/Buttons/NavigatorButton';
-import { useHooks } from './todo-list-hooks'
+import { useHooks } from './hooks'
 import { MessageWrapper } from './styles';
 
 

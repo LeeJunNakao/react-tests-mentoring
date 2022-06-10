@@ -15,13 +15,9 @@ export const useHooks = () => {
   };
   
   const removeItens = () => {
-    const bufferArray: string[] = [];
-    items.forEach(function (element) {
-      if(itemsDone.indexOf(element) == -1)
-        bufferArray.push(element);
-    });
-    setItems(bufferArray);
-    setItemsDone(bufferArray);    
+    const arr = items.filter((item) => !itemsDone.includes(item));
+    setItems(arr);
+    setItemsDone([]);
   }
   return {items, setItems, itemsDone, setItemsDone, inputValue, setInputValue, handleChange, addItem, removeItens}
 };
