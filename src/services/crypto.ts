@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Coin, CoinOption } from 'entities/Crypto';
+import { Coin } from 'entities/Crypto';
 
 type CoinGeckResponse = {
   coins: Coin[];
@@ -28,7 +28,7 @@ export const searchPrice = async (
     {
       params: {
         assets: `[${code}]`,
-        source: 'crypto',
+        source: 'CRYPTO',
         date,
         currency: 'BRL',
       },
