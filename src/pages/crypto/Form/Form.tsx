@@ -12,6 +12,7 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { addCrypto } from '../store/thunks';
 import store from '../store';
+import { QuantityContainer, LabelError } from './styles';
 
 const debounced = _.debounce(async (fn) => await fn(), 1000);
 
@@ -78,7 +79,7 @@ const Form = () => {
       ),
     );
   };
-
+  const quantityError = () => quantity !== null && quantity < '0' && quantity !== '';
   const handleClose = (
     event: React.SyntheticEvent | Event,
     reason?: string,
@@ -159,6 +160,7 @@ const Form = () => {
           alignItems: 'flex-end',
         }}
       >
+        <QuantityContainer>
         <TextField
           label='Quantity'
           variant='standard'
@@ -166,6 +168,8 @@ const Form = () => {
           onChange={handleChange(setQuantity)}
           type='number'
         />
+        { quantityError() ? <LabelError>Não é permitido valores negativos</LabelError> : <div/>}
+        </QuantityContainer>      
 
         <Button variant='contained' onClick={handleClick}>
           add
