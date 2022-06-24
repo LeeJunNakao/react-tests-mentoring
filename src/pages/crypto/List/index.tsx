@@ -1,6 +1,8 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { CryptoItem } from '../store/reducers/crypto';
 
 type RowItem = {
   id: number | string;
@@ -15,10 +17,6 @@ type Item = {
   price?: number;
 };
 
-type Props = {
-  items: Item[];
-};
-
 const columns: GridColDef[] = [
   { field: 'code', headerName: 'Code', width: 80 },
   { field: 'quantity', headerName: 'Quantity', type: 'number', width: 80 },
@@ -30,8 +28,10 @@ const columns: GridColDef[] = [
   },
 ];
 
-export const CryptoList = (props: Props) => {
-  const rows: RowItem[] = props.items.map((item, index) => ({
+export const CryptoList = () => {
+  const items = useSelector((state: { crypto: CryptoItem[] }) => state.crypto);
+
+  const rows: RowItem[] = items.map((item, index) => ({
     id: index,
     code: item.code,
     quantity: item.quantity,

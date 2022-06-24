@@ -7,10 +7,11 @@ import Button from '@mui/material/Button';
 import Autocomplete from '@mui/material/Autocomplete';
 import { Coin, CoinOption } from 'entities/Crypto';
 import CircularProgress from '@mui/material/CircularProgress';
-import { searchCrypto, searchPrice } from 'services/crypto';
-import { dateToString } from 'utils/parser';
+import { searchCrypto } from 'services/crypto';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import { addCrypto } from '../store/thunks';
+import store from '../store';
 
 const debounced = _.debounce(async (fn) => await fn(), 1000);
 
@@ -21,17 +22,8 @@ export type CryptoEntry = {
   total?: number;
 };
 
-type Props = {
-  add: (v: CryptoEntry) => void;
-};
-
-enum ErrorMessage {
-  DEFAULT = 'Could not search price',
-  UNAVAIBLE = 'This cryptocurrency is not avaible',
-}
-
-const Form = (props: Props) => {
-  const [crypto, setCrypto] = useState('helooooo');
+const Form = () => {
+  const [crypto, setCrypto] = useState('');
   const [quantity, setQuantity] = useState<string | null>('');
   const [autocompleteKey, setAutocompleteKey] = useState(1);
   const [selectedCrypto, setSelectedCrypto] = useState<Coin | null | undefined>(
@@ -40,7 +32,6 @@ const Form = (props: Props) => {
   const [searchResult, setSearchResult] = useState<Coin[]>([]);
   const [loading, setLoading] = useState(false);
   const [openError, setOpenError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(ErrorMessage.DEFAULT);
 
   const cryptoOptions = searchResult.map(
     (c): CoinOption => ({
@@ -73,33 +64,19 @@ const Form = (props: Props) => {
   };
 
   const searchCryptoPrice = async () => {
-    try {
-      setLoading(true);
-      const item = {
-        ...selectedCrypto,
-        quantity: Number(quantity),
-      };
-      const price = await searchPrice(
-        item.symbol as string,
-        dateToString(new Date()),
-      );
-
-      if (price.error) {
-        setOpenError(true);
-      } else {
-        props.add({
+    const item = { ...selectedCrypto, quantity: Number(quantity) };
+    store.dispatch(
+      addCrypto(
+        {
           code: item.symbol as string,
           quantity: Number(quantity),
-          price: price.data?.closePrice || 0,
-        });
-      }
-
-      clearForm();
-    } catch (error) {
-      setErrorMessage(ErrorMessage.DEFAULT);
-    } finally {
-      setLoading(false);
-    }
+          price: 0,
+        },
+        setOpenError,
+        setLoading,
+        clearForm,
+      ),
+    );
   };
 
   const handleClose = (
