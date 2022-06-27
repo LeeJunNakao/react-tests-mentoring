@@ -14,3 +14,13 @@ export const LoadingWrapper = styled.div`
     animation: rotation 1s infinite linear;
   }
 `;
+
+export const QuantityContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const LabelError = styled.span`
+  color: red;
+  font-size: 12px;
+`;
