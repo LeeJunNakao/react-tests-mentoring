@@ -1,4 +1,5 @@
 import React from 'react';
+import { Provider } from 'react-redux';
 import Page from 'components/Layout/Page';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -7,59 +8,76 @@ import SelectableList from 'components/Lists/SelectableList';
 import MessageBox from 'components/MessageBox';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NavigatorButton from 'components/Buttons/NavigatorButton';
-import { useHooks } from './hooks'
+import { useHooks } from './hooks';
 import { MessageWrapper } from './styles';
-
+import store from './store';
 
 const ToDoPage = () => {
-  const {items, itemsDone, setItemsDone, inputValue, handleChange, addItem, removeItens} = useHooks();
+  const {
+    items,
+    itemsDone,
+    setItemsDone,
+    inputValue,
+    handleChange,
+    addItem,
+    removeItens,
+  } = useHooks();
   return (
-    <Page title='To Do List'>
-      <>
-        <Box
-          sx={{
-            maxWidth: '300px',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <NavigatorButton text='Home' url='/' icon={ArrowBackIcon} />
-
+    <Provider store={store}>
+      <Page title='To Do List'>
+        <>
           <Box
             sx={{
+              maxWidth: '300px',
               display: 'flex',
-              alignItems: 'flex-end',
-              columnGap: '20px',
+              flexDirection: 'column',
             }}
           >
-            <TextField
-              id='outlined-required'
-              label='Item to add'
-              variant='standard'
-              value={inputValue}
-              onChange={handleChange}
-            />
-            <Button variant='contained' onClick={addItem}>
-              add
-            </Button>
-          </Box>
-          <MessageWrapper>
-            {items.length > 0 && items.length === itemsDone.length && (
-              <MessageBox text='All tasks completed successfully' />
-            )}
-          </MessageWrapper>
+            <NavigatorButton text='Home' url='/' icon={ArrowBackIcon} />
 
-          {itemsDone.length ? (
-            <Button onClick={removeItens}>
-              remover
-            </Button>
-          ) :
-            (<div />)}
-          <SelectableList items={items} onChange={setItemsDone} />
-        </Box>
-      </>
-    </Page>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                columnGap: '20px',
+              }}
+            >
+              <TextField
+                id='outlined-required'
+                label='Item to add'
+                variant='standard'
+                value={inputValue}
+                onChange={handleChange}
+              />
+              <Button variant='contained' onClick={addItem}>
+                add
+              </Button>
+            </Box>
+            <MessageWrapper>
+              {items.length > 0 && items.length === itemsDone.length && (
+                <MessageBox text='All tasks completed successfully' />
+              )}
+            </MessageWrapper>
+
+            {itemsDone.length ? (
+              <Button onClick={removeItens}>remover</Button>
+            ) : (
+              <div />
+            )}
+            <SelectableList items={items} onChange={setItemsDone} />
+          </Box>
+        </>
+      </Page>
+    </Provider>
   );
 };
 
-export default ToDoPage;
+const WrappedPage = () => {
+  return (
+    <Provider store={store}>
+      <ToDoPage />
+    </Provider>
+  );
+};
+
+export default WrappedPage;

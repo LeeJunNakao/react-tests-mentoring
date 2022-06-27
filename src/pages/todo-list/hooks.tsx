@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { addItem, removeItems, Getters } from './store/todos';
 
 export const useHooks = () => {
-  const [items, setItems] = useState<string[]>([]);
+  const dispatch = useDispatch();
+
+  const items = useSelector(Getters.todoList);
   const [itemsDone, setItemsDone] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
-  
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
-  
-  const addItem = () => {
-    setItems([...items, inputValue]);
-    setInputValue('');
+
+  const add = () => {
+    dispatch(addItem(inputValue));
   };
-  
-  const removeItens = () => {
-    const arr = items.filter((item) => !itemsDone.includes(item));
-    setItems(arr);
+
+  const remove = () => {
+    dispatch(removeItems(itemsDone));
     setItemsDone([]);
-  }
-  return {items, setItems, itemsDone, setItemsDone, inputValue, setInputValue, handleChange, addItem, removeItens}
+  };
+
+  return {
+    items,
+    itemsDone,
+    setItemsDone,
+    inputValue,
+    setInputValue,
+    handleChange,
+    addItem: add,
+    removeItens: remove,
+  };
 };
