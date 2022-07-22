@@ -34,7 +34,6 @@ describe('should testing to do list page', () => {
     const input = screen.getByRole('textbox');
 
     expect(button).toHaveTextContent(/add/i);
-    expect(button).toBeDisabled();
     expect(input).toHaveDisplayValue('');
   });
 

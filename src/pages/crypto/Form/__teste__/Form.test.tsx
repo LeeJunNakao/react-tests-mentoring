@@ -13,7 +13,7 @@ describe('should testing page form', () => {
   const renderComponet = () => {
     render(
       <Router location={history.location} navigator={history}>
-        <Form add={addCrypto}/>
+        <Form />
       </Router>,
     )
   };

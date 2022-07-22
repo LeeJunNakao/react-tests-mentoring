@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '.';
 
-type State = {
+export type State = {
   todoList: string[];
 };
 
